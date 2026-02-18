@@ -235,18 +235,21 @@ trait TranferirDataTraits
         | 1. Limpiar tabla destino (rápido)
         |--------------------------------------------------------------------------
         */
-        DB::connection('pgsqlwin')->statement('TRUNCATE TABLE venta_arroz_raw RESTART IDENTITY');
-
-
+        //DB::connection('pgsqlwin')->statement('TRUNCATE TABLE venta_arroz_raw RESTART IDENTITY');
+        DB::connection('pgsqlwin')
+            ->table('venta_arroz_raw')
+            ->whereYear('fecha_venta', '>=', 2025)
+            ->delete();
         /*
         |--------------------------------------------------------------------------
         | 2. Procesar en chunks con orden estable
         |--------------------------------------------------------------------------
         */
+        //dd("elimino");
         $totalProcesados = 0;
 
         DB::connection('sqlsrv_r')
-            ->table('VentasConsolidado')
+            ->table('VentasConsolidado2025')
             ->orderBy('FECHA')
             ->orderBy('ORDEN') // Campo estable (ajusta si tienes un ID único)
             ->chunk(1000, function ($ventas) use (&$totalProcesados) {
